@@ -7,9 +7,10 @@ public class ManagerLoadingGame : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _loadingTxt;
 
-    private void Start()
+    private void Update()
     {
-        
+        Services.SceneTransitions.SceneTransition.SwitchToScene("Level1");
+        enabled = false;
     }
 
     public void SetloadingText(string text)
