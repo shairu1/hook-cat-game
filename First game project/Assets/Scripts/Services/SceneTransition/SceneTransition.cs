@@ -8,6 +8,8 @@ namespace Services.SceneTransitions
 {
     public class SceneTransition : MonoBehaviour
     {
+        public Camera cam;
+
         [SerializeField] private TextMeshProUGUI _loadingText;
 
         private static SceneTransition instance;
@@ -72,44 +74,3 @@ namespace Services.SceneTransitions
         }
     }
 }
-
-/*
- 
- private static GameObject _sceneTransitionPrefab;
-        private static SceneTransitionController _transitionController;
-
-        public static void SwitchToScene(string sceneName)
-        {
-            if (_transitionController == null)
-                CreateSceneTransitionObject();
-
-            _transitionController.SwitchToScene(sceneName);
-        }
-
-        public static void CreateSceneTransitionObject()
-        {
-            if (_transitionController == null)
-            {
-                Transform canvas = Camera.main.transform.Find("Canvas");
-                _transitionController = canvas.transform.GetComponentInChildren<SceneTransitionController>();
-
-                if (_transitionController == null)
-                {
-                    GameObject go = Object.Instantiate(GetSceneTransitionPrefab(), canvas);
-                    _transitionController = go.GetComponent<SceneTransitionController>();
-                }
-            }
-        }
-
-        private static GameObject GetSceneTransitionPrefab()
-        {
-            if (_sceneTransitionPrefab == null)
-            {
-                _sceneTransitionPrefab = Resources.Load<GameObject>(
-                    "SceneTransition/SceneTransitionCurtain.prefab");
-            }
-
-            return _sceneTransitionPrefab;
-        }
- 
- */
