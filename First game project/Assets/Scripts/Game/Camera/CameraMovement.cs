@@ -23,14 +23,14 @@ public class CameraMovement : MonoBehaviour
         _transform = GetComponent<Transform>();
     }
 
-    void LateUpdate()
+    void FixedUpdate()
     {
         if (_size != _camera.orthographicSize)
         {
             if (_size > _camera.orthographicSize)
-                _camera.orthographicSize += _sizeSpeed * Time.deltaTime * 2;
+                _camera.orthographicSize += _sizeSpeed * Time.fixedDeltaTime;
             else
-                _camera.orthographicSize -= _sizeSpeed * Time.deltaTime * 2;
+                _camera.orthographicSize -= _sizeSpeed * Time.fixedDeltaTime;
 
 
             if (Mathf.Abs(_size - _camera.orthographicSize) <= _minDeltaSize)
@@ -41,7 +41,10 @@ public class CameraMovement : MonoBehaviour
 
         Vector3 targetPosition = _target.position;
         targetPosition.z = _transform.position.z;
-        _transform.position = Vector3.Lerp(_transform.position, targetPosition, _speed * Time.deltaTime);
+
+        _transform.Translate(Vector3.Lerp(
+            _transform.position, targetPosition, _speed * Time.fixedDeltaTime) - _transform.position, 
+            Space.World);
     }
 
     public static void SetSize(float size, bool smoothly)

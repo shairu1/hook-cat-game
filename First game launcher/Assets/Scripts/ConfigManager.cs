@@ -1,6 +1,7 @@
 using System.IO;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 public static class ConfigManager
 {
@@ -40,6 +41,31 @@ public static class ConfigManager
         else
         {
             config = JsonUtility.FromJson<ConfigFile>(File.ReadAllText(path));
+
+            List<LauncherManager.GameVersion> versions = new List<LauncherManager.GameVersion>();
+            for (int i = 0; i < config.downloadedVersionsGame.Length; i++)
+            {
+                string pathGame = Path.Combine(Application.dataPath, config.gameFolder,
+                    config.downloadedVersionsGame[i].gameExe);
+
+                if (File.Exists(pathGame))
+                    versions.Add(config.downloadedVersionsGame[i]);
+            }
+
+            config.downloadedVersionsGame = versions.ToArray();
+
+            bool check = true;
+            for (int i = 0; i < config.downloadedVersionsGame.Length; i++)
+            {
+                if (config.downloadedVersionsGame[i].gameVersion == config.gameVersion)
+                {
+                    check = false;
+                    break;
+                }      
+            }
+
+            if (check)
+                config.gameVersion = "-";
         } 
     }
 
@@ -52,9 +78,10 @@ public static class ConfigManager
     [Serializable]
     public class ConfigFile
     {
-        public string gameVersion;
-        public string gameFolder;
-        public string uploadFolder;
+        public LauncherManager.GameVersion[] downloadedVersionsGame;
+        public string gameVersion; // выбранная версия игры
+        public string gameFolder; // папка с играми
+        public string uploadFolder; // загрузки
         public string serverURL;
         public string serverInfoURL;
         public string gameExe;
@@ -62,6 +89,7 @@ public static class ConfigManager
         public ConfigFile(string version, string gameF, string uploadF, string serverURl,
             string serverInfoURL, string gameExe)
         {
+            downloadedVersionsGame = new LauncherManager.GameVersion[0];
             this.gameVersion = version;
             this.gameFolder = gameF;
             this.uploadFolder = uploadF;

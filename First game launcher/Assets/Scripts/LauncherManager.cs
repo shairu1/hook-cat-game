@@ -10,8 +10,8 @@ using System.Collections;
 public class LauncherManager : MonoBehaviour
 {
     private ButtonType buttonType;
-
     private InfoFile info; // с сервера о игре
+    private string downloadingVersion;
 
     private void Start()
     {
@@ -45,8 +45,10 @@ public class LauncherManager : MonoBehaviour
         );
     }
     
-    private void UpdateGame()
+    private void DownloadGame(string version)
     {
+        downloadingVersion = version;
+
         UIManager.SetActivLoadingBar(true);
         UIManager.SetLoadingBar(0);
         SetButtonType(ButtonType.None);
@@ -60,12 +62,11 @@ public class LauncherManager : MonoBehaviour
 
         ShaiNetwork.DownloadFileAsync
         (
-            ConfigManager.config.serverURL + info.gameURL,
+            ConfigManager.config.serverURL + info.GetGameVersion(downloadingVersion).gameURL,
             pathGame,
             new DownloadProgressChangedEventHandler[] { DownloadGameProgress },
             new AsyncCompletedEventHandler[] { DownloadGameCompleted }
         );
-
     }
 
     private void DownloadGameProgress(object sender, DownloadProgressChangedEventArgs e)
@@ -80,14 +81,8 @@ public class LauncherManager : MonoBehaviour
         {
             string pathGameFolder = Path.Combine(Application.dataPath, ConfigManager.config.gameFolder);
 
-            if (Directory.Exists(pathGameFolder))
-                Directory.Delete(pathGameFolder, true);
-
-            Directory.CreateDirectory(pathGameFolder);
-
             UIManager.SetLoadingBar(1);
             UIManager.SetLoadingText("Установка игры");
-            Camera.main.Render();
 
             StartCoroutine(ExtractZipFile
             (
@@ -107,13 +102,14 @@ public class LauncherManager : MonoBehaviour
 
         ZipFile.ExtractToDirectory(file, directory);
 
-        ConfigManager.config.gameVersion = info.gameVersion;
-        ConfigManager.config.gameExe = info.gameExe;
+        ConfigManager.config.gameVersion = info.GetGameVersion(downloadingVersion).gameVersion;
+        ConfigManager.config.gameExe = info.GetGameVersion(downloadingVersion).gameExe;
         ConfigManager.SaveConfig();
 
         UIManager.SetActivLoadingBar(false);
 
         UIManager.SetGameVersion(ConfigManager.config.gameVersion);
+        VersionManager.SetSelectVersion(ConfigManager.config.gameVersion);
 
         SetButtonType(ButtonType.Play);
 
@@ -129,10 +125,13 @@ public class LauncherManager : MonoBehaviour
         {
             info = JsonUtility.FromJson<InfoFile>(File.ReadAllText(pathInfo));
 
-            if (info.gameVersion != ConfigManager.config.gameVersion)
-                SetButtonType(ButtonType.Update);
-            else
+            VersionManager.UpdateVersions(info);
+
+            if (ConfigManager.config.gameVersion != "-")
+            {
+                VersionManager.SetSelectVersion(ConfigManager.config.gameVersion);
                 SetButtonType(ButtonType.Play);
+            } 
         }
         else
         {
@@ -145,13 +144,7 @@ public class LauncherManager : MonoBehaviour
 
     private void SetButtonType(ButtonType type)
     {
-        if (type == ButtonType.None)
-            UIManager.SetButtonText("Играть");
-        else if (type == ButtonType.Update)
-            UIManager.SetButtonText("Обновить");
-        else if (type == ButtonType.Play)
-            UIManager.SetButtonText("Играть");
-
+        UIManager.SetButtonText("Играть");
         buttonType = type;
     }
 
@@ -172,41 +165,38 @@ public class LauncherManager : MonoBehaviour
                 System.Diagnostics.Process.Start(path);
             }
         }
-        else if (buttonType == ButtonType.Update)
-        {
-            UpdateGame();
-        }
     }
 
     [Serializable]
     public class InfoFile
     {
+        public GameVersion[] gameVersions;
+
+        public GameVersion GetGameVersion(string version)
+        {
+            for (int i = 0; i < gameVersions.Length; i++)
+            {
+                if (gameVersions[i].gameVersion == version)
+                    return gameVersions[i];
+            }
+
+            return null;
+        }
+    }
+
+    [Serializable]
+    public class GameVersion
+    {
+        public string gameData;
         public string gameVersion;
         public string gameURL;
         public string gameExe;
-
-        public InfoFile()
-        {
-            gameVersion = "";
-            gameURL = "";
-            gameExe = "";
-        }
-
-        public InfoFile(string gameVersion, string gameURL, string gameExe)
-        {
-            this.gameVersion = gameVersion;
-            this.gameURL = gameURL;
-            this.gameExe = gameExe;
-        }
     }
+
 }
 
 public enum ButtonType // Тип кнопки при нажатии
 {
     None,
-    Update,
     Play
 }
-
-
-
