@@ -69,10 +69,60 @@ public static class ConfigManager
         } 
     }
 
+    public static void AddDownloadedVersion(LauncherManager.GameVersion version)
+    {
+        for (int i = 0; i < config.downloadedVersionsGame.Length; i++)
+        {
+            if (config.downloadedVersionsGame[i].gameVersion == version.gameVersion)
+                return;
+        }
+
+        LauncherManager.GameVersion[] newVersions = 
+            new LauncherManager.GameVersion[config.downloadedVersionsGame.Length + 1];
+
+        for (int i = 0; i < config.downloadedVersionsGame.Length; i++)
+        {
+            newVersions[i] = config.downloadedVersionsGame[i];
+        }
+
+        newVersions[newVersions.Length - 1] = version;
+
+        config.downloadedVersionsGame = newVersions;
+        SaveConfig();
+    }
+
     public static void SaveConfig()
     {
         string path = Path.Combine(Application.dataPath, config_file);
         File.WriteAllText(path, JsonUtility.ToJson(config));
+    }
+
+    public static bool CheckLoadedVersion(string version)
+    {
+        for (int i = 0; i < config.downloadedVersionsGame.Length; i++)
+        {
+            if (config.downloadedVersionsGame[i].gameVersion == version)
+                return true;
+        }
+
+        return false;
+    }
+
+    public static void SetSelectGameVersion(string version)
+    {
+        config.gameVersion = version;
+        SaveConfig();
+    }
+
+    public static string GetPathGameExe()
+    {
+        for (int i = 0; i < config.downloadedVersionsGame.Length; i++)
+        {
+            if (config.downloadedVersionsGame[i].gameVersion == config.gameVersion)
+                return config.downloadedVersionsGame[i].gameExe;
+        }
+
+        return "";
     }
 
     [Serializable]
@@ -84,7 +134,6 @@ public static class ConfigManager
         public string uploadFolder; // загрузки
         public string serverURL;
         public string serverInfoURL;
-        public string gameExe;
 
         public ConfigFile(string version, string gameF, string uploadF, string serverURl,
             string serverInfoURL, string gameExe)
@@ -95,7 +144,6 @@ public static class ConfigManager
             this.uploadFolder = uploadF;
             this.serverURL = serverURl;
             this.serverInfoURL = serverInfoURL;
-            this.gameExe = gameExe;
         }
     }
 }

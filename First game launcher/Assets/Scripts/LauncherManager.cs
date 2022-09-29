@@ -9,12 +9,17 @@ using System.Collections;
 
 public class LauncherManager : MonoBehaviour
 {
+    private static LauncherManager instance;
+    public static bool updating;
+
     private ButtonType buttonType;
     private InfoFile info; // с сервера о игре
-    private string downloadingVersion;
+    private GameVersion downloadingVersion;
 
     private void Start()
     {
+        instance = this;
+
         SetButtonType(ButtonType.None);
         UIManager.SetActivLoadingBar(false);
         UIManager.SetButtonText("Синхронизация");
@@ -45,13 +50,14 @@ public class LauncherManager : MonoBehaviour
         );
     }
     
-    private void DownloadGame(string version)
+    public static void DownloadGame(GameVersion version)
     {
-        downloadingVersion = version;
+        updating = true;
+        instance.downloadingVersion = version;
 
         UIManager.SetActivLoadingBar(true);
         UIManager.SetLoadingBar(0);
-        SetButtonType(ButtonType.None);
+        instance.SetButtonType(ButtonType.None);
         UIManager.SetButtonText("Обновление");
         UIManager.SetLoadingText("Загрузка обновления" + " (0%)");
 
@@ -62,20 +68,20 @@ public class LauncherManager : MonoBehaviour
 
         ShaiNetwork.DownloadFileAsync
         (
-            ConfigManager.config.serverURL + info.GetGameVersion(downloadingVersion).gameURL,
+            ConfigManager.config.serverURL + instance.downloadingVersion.gameURL,
             pathGame,
             new DownloadProgressChangedEventHandler[] { DownloadGameProgress },
             new AsyncCompletedEventHandler[] { DownloadGameCompleted }
         );
     }
 
-    private void DownloadGameProgress(object sender, DownloadProgressChangedEventArgs e)
+    private static void DownloadGameProgress(object sender, DownloadProgressChangedEventArgs e)
     {
         UIManager.SetLoadingText("Загрузка обновления" + $" ({e.ProgressPercentage}%)");
         UIManager.SetLoadingBar(Mathf.Lerp(UIManager.GetLoadingBar(), e.ProgressPercentage / 100.0f, 0.01f));
     }
 
-    private void DownloadGameCompleted(object sender, AsyncCompletedEventArgs e)
+    private static void DownloadGameCompleted(object sender, AsyncCompletedEventArgs e)
     {
         if (e.Error == null)
         {
@@ -84,7 +90,7 @@ public class LauncherManager : MonoBehaviour
             UIManager.SetLoadingBar(1);
             UIManager.SetLoadingText("Установка игры");
 
-            StartCoroutine(ExtractZipFile
+            instance.StartCoroutine(ExtractZipFile
             (
                 Path.Combine(Application.dataPath, ConfigManager.config.uploadFolder, "game.zip"),
                 Path.Combine(Application.dataPath, ConfigManager.config.gameFolder)
@@ -92,28 +98,34 @@ public class LauncherManager : MonoBehaviour
         }
         else
         {
-            SetButtonType(ButtonType.Play);
+            instance.SetButtonType(ButtonType.Play);
         }
     }
 
-    IEnumerator ExtractZipFile(string file, string directory)
+    private static IEnumerator ExtractZipFile(string file, string directory)
     {
         yield return new WaitForSeconds(0.5f);
 
         ZipFile.ExtractToDirectory(file, directory);
 
-        ConfigManager.config.gameVersion = info.GetGameVersion(downloadingVersion).gameVersion;
-        ConfigManager.config.gameExe = info.GetGameVersion(downloadingVersion).gameExe;
-        ConfigManager.SaveConfig();
-
         UIManager.SetActivLoadingBar(false);
 
-        UIManager.SetGameVersion(ConfigManager.config.gameVersion);
-        VersionManager.SetSelectVersion(ConfigManager.config.gameVersion);
+        instance.SetButtonType(ButtonType.Play);
 
-        SetButtonType(ButtonType.Play);
+        yield return new WaitForSeconds(0.5f);
+
+        ConfigManager.AddDownloadedVersion(instance.downloadingVersion);
+        VersionManager.UpdateVersions(instance.info.gameVersions);
+        updating = false;
 
         yield break;
+    }
+
+    public static void SetGameVersion(string version)
+    {
+        ConfigManager.SetSelectGameVersion(version);
+        VersionManager.SetSelectGameVersion(version);
+        UIManager.SetGameVersion(version);
     }
 
     // загрузка файла с информацией о игре
@@ -125,11 +137,11 @@ public class LauncherManager : MonoBehaviour
         {
             info = JsonUtility.FromJson<InfoFile>(File.ReadAllText(pathInfo));
 
-            VersionManager.UpdateVersions(info);
+            VersionManager.UpdateVersions(info.gameVersions);
 
             if (ConfigManager.config.gameVersion != "-")
             {
-                VersionManager.SetSelectVersion(ConfigManager.config.gameVersion);
+                VersionManager.SetSelectGameVersion(ConfigManager.config.gameVersion);
                 SetButtonType(ButtonType.Play);
             } 
         }
@@ -158,7 +170,7 @@ public class LauncherManager : MonoBehaviour
         {
             string path = Path.Combine(Application.dataPath,
                 ConfigManager.config.gameFolder,
-                ConfigManager.config.gameExe);
+                ConfigManager.GetPathGameExe());
 
             if (File.Exists(path))
             {

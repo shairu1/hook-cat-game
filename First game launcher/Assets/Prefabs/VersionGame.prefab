@@ -228,8 +228,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8947db25887325a44983ecb0b9b7d3b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  versionUpdatePrefab: {fileID: 0}
-  versionPrefab: {fileID: 0}
+  _textPro: {fileID: 271837496051912896}
+  _background: {fileID: 8078524239423384529}
 --- !u!114 &7675147946636843036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,4 +273,16 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8078524239423384529}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8471995237058904710}
+        m_TargetAssemblyTypeName: ControllerVersion, Assembly-CSharp
+        m_MethodName: OnButtonDown
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
