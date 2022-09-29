@@ -11,8 +11,13 @@ public class Hook : MonoBehaviour
 
     public float MaxRaycastDistance;
     public float MinHookLength;
+
+    // Stage HookFlight
     public float SpeedOfChangeHookLength;
-    public float HookForce;
+
+    // Stage PlayerFlight
+    public float SpeedChangeVelocity; // Сила, которая будет изменьят скорость
+    public float SpeedPlayerInFlight; // скорость, к которой будет стримиться игрок
 
     private Collider2D _collider;
     private Rigidbody2D _rigidbody;
@@ -38,46 +43,71 @@ public class Hook : MonoBehaviour
     {
         if (_hit.collider != null && _stage != HookStage.None)
         {
-            Vector2 positionHook= Vector2.zero;
+            Vector2 positionHook = Vector2.zero;
 
-            if (_stage == HookStage.HookFlight)
+            switch (_stage)
             {
-                if (Vector2.Distance(_positionHookInFlight, _hit.point) > 0.1f)
-                {
-                    positionHook = Vector2.MoveTowards(_positionHookInFlight,
-                        _hit.point, SpeedOfChangeHookLength * Time.deltaTime);
+                case HookStage.HookFlight:
+                    HookFlight(out positionHook);
+                    break;
 
-                    _positionHookInFlight = positionHook;
-                }
-                else
-                {
-                    _stage = HookStage.PlayerFlight;
+                case HookStage.PlayerFlight:
                     positionHook = _hit.point;
-                }
-            }
-            else if (_stage == HookStage.PlayerFlight)
-            {
-                if (Vector2.Distance(transform.position, _hit.point) > MinHookLength)
-                {
-                    Vector3 direction = (Vector3)_hit.point - transform.position;
-                    _rigidbody.velocity = direction.normalized * HookForce;
-                }
-                else
-                {
-                    _stage = HookStage.Hitch;
-                    SetActiveDistanceJoint(true);
-                }
-                
-                positionHook = _hit.point;
-            }
-            else if (_stage == HookStage.Hitch)
-            {
-                positionHook = _hit.point;
-                _collider.isTrigger = false;
+                    break;
+
+                case HookStage.Hitch:
+                    Hitch(out positionHook);
+                    break;
             }
 
             _hookRenderer.Render(transform.position, positionHook);
         }  
+    }
+
+    private void FixedUpdate()
+    {
+        if (_stage == HookStage.PlayerFlight)
+        {
+            PlayerFlight();
+        }
+    }
+
+    private void HookFlight(out Vector2 positionHook)
+    {
+        if (Vector2.Distance(_positionHookInFlight, _hit.point) > 0.1f)
+        {
+            positionHook = Vector2.MoveTowards(_positionHookInFlight,
+                _hit.point, SpeedOfChangeHookLength * Time.deltaTime);
+
+            _positionHookInFlight = positionHook;
+        }
+        else
+        {
+            _stage = HookStage.PlayerFlight;
+            positionHook = _hit.point;
+        }
+    }
+
+    private void PlayerFlight()
+    {
+        _collider.isTrigger = true;
+
+        if (Vector2.Distance(transform.position, _hit.point) > MinHookLength)
+        {
+            Vector2 direction = ((Vector2)((Vector3)_hit.point - transform.position)).normalized * SpeedPlayerInFlight;
+            _rigidbody.velocity = Vector2.Lerp(_rigidbody.velocity, direction, Time.fixedDeltaTime * SpeedChangeVelocity);
+        }
+        else
+        {
+            _stage = HookStage.Hitch;
+            SetActiveDistanceJoint(true);
+        }
+    }
+
+    private void Hitch(out Vector2 positionHook)
+    {
+        positionHook = _hit.point;
+        _collider.isTrigger = false;
     }
 
     public void CreateHook()
@@ -101,7 +131,6 @@ public class Hook : MonoBehaviour
         
         _stage = HookStage.HookFlight;
         _positionHookInFlight = transform.position;
-        _collider.isTrigger = true;
         enabled = true;
     }
 

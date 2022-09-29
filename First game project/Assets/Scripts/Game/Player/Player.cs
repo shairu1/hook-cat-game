@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public float Speed;
     public float MaxSpeed;
     public float BrakingSpeed;
+    public float JumpForce;
 
     [SerializeField] private Hook _hook;
 
@@ -22,17 +23,20 @@ public class Player : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            if (_hook.enabled)
+                _hook.DisableHook();
+
             _hook.CreateHook();
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && _hook.enabled)
         {
             _hook.DisableHook();
         }
 
         if (Input.GetKeyDown(KeyCode.W) && _isGround)
         {
-            _rigidbody.AddForce(Vector2.up * 500);
+            _rigidbody.AddForce(Vector2.up * JumpForce);
         }
     }
 

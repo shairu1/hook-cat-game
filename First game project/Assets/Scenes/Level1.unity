@@ -2685,9 +2685,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d522c68afa716b24280f8010df4cf881, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 3
-  MaxSpeed: 5
-  BrakingSpeed: 1
+  Speed: 40
+  MaxSpeed: 10
+  BrakingSpeed: 5
+  JumpForce: 400
   _hook: {fileID: 1966266876}
 --- !u!4 &1966266872
 Transform:
@@ -2720,9 +2721,9 @@ DistanceJoint2D:
   m_BreakTorque: Infinity
   m_AutoConfigureConnectedAnchor: 0
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: -0.74, y: -0.69}
+  m_ConnectedAnchor: {x: 0, y: 0}
   m_AutoConfigureDistance: 1
-  m_Distance: 0.005
+  m_Distance: 1.0117806
   m_MaxDistanceOnly: 0
 --- !u!114 &1966266875
 MonoBehaviour:
@@ -2757,7 +2758,8 @@ MonoBehaviour:
   MaxRaycastDistance: 100
   MinHookLength: 1
   SpeedOfChangeHookLength: 90
-  HookForce: 80
+  SpeedChangeVelocity: 3
+  SpeedPlayerInFlight: 35
 --- !u!114 &1966266877
 MonoBehaviour:
   m_ObjectHideFlags: 0
