@@ -8,8 +8,6 @@ namespace Services.SceneTransitions
 {
     public class SceneTransition : MonoBehaviour
     {
-        public Camera cam;
-
         [SerializeField] private TextMeshProUGUI _loadingText;
 
         private static SceneTransition instance;

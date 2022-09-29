@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private Hook _hook;
+
     public float Speed;
     public float MaxSpeed;
     public float BrakingSpeed;
     public float JumpForce;
 
-    [SerializeField] private Hook _hook;
-
     private Rigidbody2D _rigidbody;
     private bool _isGround;
+
 
     private void Start()
     {

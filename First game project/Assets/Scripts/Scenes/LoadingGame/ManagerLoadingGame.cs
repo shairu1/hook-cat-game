@@ -5,9 +5,9 @@ using TMPro;
 
 public class ManagerLoadingGame : MonoBehaviour
 {
-    public Camera cam;
-
     [SerializeField] private TextMeshProUGUI _loadingTxt;
+
+    public Camera cam;
 
     private void Update()
     {

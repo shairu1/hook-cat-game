@@ -11,13 +11,9 @@ public class Hook : MonoBehaviour
 
     public float MaxRaycastDistance;
     public float MinHookLength;
-
-    // Stage HookFlight
-    public float SpeedOfChangeHookLength;
-
-    // Stage PlayerFlight
-    public float SpeedChangeVelocity; // Сила, которая будет изменьят скорость
-    public float SpeedPlayerInFlight; // скорость, к которой будет стримиться игрок
+    public float SpeedOfChangeHookLength;   // Stage HookFlight
+    public float SpeedChangeVelocity;       // Stage PlayerFlight. Сила, которая будет изменьят скорость 
+    public float SpeedPlayerInFlight;       // Stage PlayerFlight. Скорость, к которой будет стримиться игрок
 
     private Collider2D _collider;
     private Rigidbody2D _rigidbody;
