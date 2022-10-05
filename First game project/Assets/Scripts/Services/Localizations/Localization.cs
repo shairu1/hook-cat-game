@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Services.Localizations
 {
-    public static class LocalizationManager
+    public static class Localization
     {
         private const string pathToLanguagesFolder = @"Data\Localizations";
         private const string pathToLanguagesFolderInResources = "Localizations/";

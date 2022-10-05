@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     public float MaxSpeed;
     public float BrakingSpeed;
     public float JumpForce;
+    public float GroundCheckDistance;
 
     private Rigidbody2D _rigidbody;
     private bool _isGround;
@@ -21,6 +22,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        CheckGround();
+
         if (Input.GetMouseButtonDown(0))
         {
             if (_hook.enabled)
@@ -37,6 +40,20 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W) && _isGround)
         {
             _rigidbody.AddForce(Vector2.up * JumpForce);
+        }
+
+        UIManager.SetVelocityText(((int)(_rigidbody.velocity.magnitude * 10) / 10.0f).ToString());
+    }
+
+    private void CheckGround()
+    {
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Vector2.down, GroundCheckDistance);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].collider != null)
+            {
+                _isGround = hits[i].collider.tag == "Ground";
+            }
         }
     }
 
@@ -63,28 +80,6 @@ public class Player : MonoBehaviour
                 Vector2 velocity = _rigidbody.velocity;
                 velocity.x = Mathf.Lerp(velocity.x, 0, BrakingSpeed * Time.fixedDeltaTime * 5);
                 _rigidbody.velocity = velocity;
-            }
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider != null)
-        {
-            if (collision.collider.tag == "Ground")
-            {
-                _isGround = true;
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.collider != null)
-        {
-            if (collision.collider.tag == "Ground")
-            {
-                _isGround = false;
             }
         }
     }

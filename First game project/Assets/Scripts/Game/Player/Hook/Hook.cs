@@ -108,17 +108,43 @@ public class Hook : MonoBehaviour
     {
         Vector2 target = _camera.ScreenToWorldPoint(Input.mousePosition);
 
+        bool pendant = false;
         float minDistance = float.MaxValue;
         RaycastHit2D[] hits = _hookRaycaster.Raycast(transform.position, target, MaxRaycastDistance);
         for (int i = 0; i < hits.Length; i++)
         {
             if (hits[i].collider != null)
             {
-                float distance = Vector2.Distance(hits[i].point, target);
-                if (distance < minDistance)
+                if (pendant)
                 {
-                    minDistance = distance;
-                    _hit = hits[i];
+                    float distance = Vector2.Distance(hits[i].point, target);
+
+                    if (hits[i].collider.tag != "Pendant")
+                        continue;
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        _hit = hits[i];
+                    }
+                }
+                else
+                {
+                    if (hits[i].collider.tag == "Pendant")
+                    {
+                        pendant = true;
+                        minDistance = float.MaxValue;
+                        i -= 1;
+                        continue;
+                    }
+
+                    float distance = Vector2.Distance(transform.position, hits[i].point);
+
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        _hit = hits[i];
+                    }
                 }
             } 
         }
