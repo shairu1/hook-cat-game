@@ -64,25 +64,25 @@ public class Player : MonoBehaviour
     {
         Vector2 velocity = _rigidbody.velocity;
 
-        if (!_hook.enabled)
+        if (_hook.enabled)
+            return;
+
+        float horizontalDirection = (Input.GetKey(KeyCode.A) || Input.GetKeyDown(KeyCode.A)) ? -1 :
+            ((Input.GetKeyDown(KeyCode.D) || Input.GetKey(KeyCode.D)) ? 1 : 0);
+        if (horizontalDirection != 0)
         {
-            float horizontalDirection = (Input.GetKey(KeyCode.A) || Input.GetKeyDown(KeyCode.A)) ? -1 :
-                ((Input.GetKeyDown(KeyCode.D) || Input.GetKey(KeyCode.D)) ? 1 : 0);
-            if (horizontalDirection != 0)
-            {
-                _rigidbody.AddForce(new Vector2(horizontalDirection, 0) * speed, ForceMode2D.Impulse);
-                
-                if (Mathf.Abs(_rigidbody.velocity.x) > maxSpeed)
-                {
-                    velocity.x = _rigidbody.velocity.x > 0 ? maxSpeed : -maxSpeed;
-                    _rigidbody.velocity = velocity;
-                }
-            }
-            else if (_rigidbody.velocity.x != 0)
-            {
-                velocity.x = Mathf.Lerp(velocity.x, 0, brakingSpeed * Time.fixedDeltaTime * 5);
-                _rigidbody.velocity = velocity;
-            }
+            _rigidbody.AddForce(new Vector2(horizontalDirection, 0) * speed, ForceMode2D.Impulse);
+
+            if (!(Mathf.Abs(_rigidbody.velocity.x) > maxSpeed))
+                return;
+
+            velocity.x = _rigidbody.velocity.x > 0 ? maxSpeed : -maxSpeed;
+            _rigidbody.velocity = velocity;
+        }
+        else if (_rigidbody.velocity.x != 0)
+        {
+            velocity.x = Mathf.Lerp(velocity.x, 0, brakingSpeed * Time.fixedDeltaTime * 5);
+            _rigidbody.velocity = velocity;
         }
     }
     /// <summary>

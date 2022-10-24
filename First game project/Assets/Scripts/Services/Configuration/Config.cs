@@ -33,7 +33,7 @@ namespace Services.Configuration
             set { Screen.fullScreen = value;  }
         }
 
-        public static float masterVolume // îáùàÿ ãðîìêîñòü
+        public static float masterVolume 
         {
             get { return _config.masterVolume; }
             set { _config.masterVolume = value; }
@@ -41,8 +41,8 @@ namespace Services.Configuration
 
         public static float musicVolume
         {
-            get { return _config.musiñVolume; }
-            set { _config.musiñVolume = value; }
+            get { return _config.musicVolume; }
+            set { _config.musicVolume = value; }
         }
 
         public static float soundVolume
@@ -81,13 +81,13 @@ namespace Services.Configuration
             public bool fullScreen;
             public float masterVolume;
             public float soundVolume;
-            public float musiñVolume;
+            public float musicVolume;
 
             public ConfigFile()
             {
                 this.fullScreen = true;
                 this.masterVolume = 100;
-                this.musiñVolume = 100;
+                this.musicVolume = 100;
                 this.soundVolume = 100;
             }
         }

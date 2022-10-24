@@ -3581,7 +3581,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 69fc5cf6c0e22db498223385528508f5, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -3651,11 +3651,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hook: {fileID: 1966266876}
-  Speed: 40
-  MaxSpeed: 10
-  BrakingSpeed: 5
+  speed: 40
+  maxSpeed: 10
+  brakingSpeed: 20
   JumpForce: 400
-  GroundCheckDistance: 0.6
+  StompForce: 600
 --- !u!4 &1966266872
 Transform:
   m_ObjectHideFlags: 0
