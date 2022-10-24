@@ -10,8 +10,8 @@ public class Hook : MonoBehaviour
     public float MaxRaycastDistance;
     public float MinHookLength;
     public float SpeedOfChangeHookLength;   // Stage HookFlight
-    public float SpeedChangeVelocity;       // Stage PlayerFlight. Ñèëà, êîòîðàÿ áóäåò èçìåíüÿò ñêîðîñòü 
-    public float SpeedPlayerInFlight;       // Stage PlayerFlight. Ñêîðîñòü, ê êîòîðîé áóäåò ñòðèìèòüñÿ èãðîê
+    public float SpeedChangeVelocity;       // Stage PlayerFlight. ????, ??????? ????? ???????? ???????? 
+    public float SpeedPlayerInFlight;       // Stage PlayerFlight. ????????, ? ??????? ????? ?????????? ?????
 
     private Collider2D _collider;
     private Rigidbody2D _rigidbody;
@@ -86,6 +86,7 @@ public class Hook : MonoBehaviour
     {
         _collider.isTrigger = true;
 
+        // Ñ€Ð°ÑÑÑ‚Ð¾ÑÐ½Ð¸Ðµ Ð¾Ñ‚ Ð¸Ð³Ñ€Ð¾ÐºÐ° Ð´Ð¾ Ñ‚Ð¾Ñ‡ÐºÐ¸ Ð¿Ð¾Ð¿Ð°Ð´Ð°Ð½Ð¸Ðµ ÐºÑ€ÑŽÐºÐ° > Ð´Ð»Ð¸Ð½Ð° ÐºÑ€ÑŽÐºÐ°
         if (Vector2.Distance(transform.position, _hit.point) > MinHookLength)
         {
             Vector2 direction = ((Vector2)((Vector3)_hit.point - transform.position)).normalized * SpeedPlayerInFlight;
@@ -104,6 +105,9 @@ public class Hook : MonoBehaviour
         _collider.isTrigger = false;
     }
 
+    /// <summary>
+    /// Ð¡Ð¾Ð·Ð´Ð°Ñ‘Ñ‚ ÐºÑ€ÑŽÐº
+    /// </summary>
     public void CreateHook()
     {
         Vector2 target = _camera.ScreenToWorldPoint(Input.mousePosition);
@@ -161,8 +165,8 @@ public class Hook : MonoBehaviour
         if (value) 
             _distanceJoint.connectedAnchor = _hit.collider == null ? Vector2.zero : _hit.point;
     }
-
-    public void DisableHook()
+    
+    public void DestroyHook()
     {
         SetActiveDistanceJoint(false);
         _hookRenderer.Disable();
